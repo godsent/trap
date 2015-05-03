@@ -1,34 +1,120 @@
 #lib/trap.rb
-module Trap
-  module Defaults
-    module Fireboll
-      def default_options
-        { speed: 16, damage: 200, se: 'Fire1' }
-      end
-    end
+#Traps library
+#Author: Iren_Rin
+#Terms of use: none
+#Requirements: AASM, Ticker. Messager is supported
+#Version 0.0.1
+#How to install
+#- install AASM
+#- install Ticker
+#- install Messager (not required, but supported)
+#- install the script as gem with Sides script loader OR add batch.rb to a project scripts
+#How to use
+#- read through Trap::Defaults, change if needed
+####Thorns
+#Thors is collection of events. Trap::Thorns will switch local switches
+#of each of these events from A to D by timing.
+#When character stands on a event from the collection
+#and it switches to A local switch, the character will
+#be damaged.
+#You can create thorns with following
+#trap = Trap::Thorns.build 'thorns1' do #.build method must be called with unique selector
+#  map 1             #map id, required
+#  events 1, 2, 3, 4 #also events can be setted with array or range
+#  damage 20         #damage
+#end
+#trap.run
+#Then you can receive the trap object with the unique selector
+#Trap['thorns1'].stop
+#Trap['thorns1'].run
+####Fireboll
+#Fireboll is missile that fly by route and deal damage if touches character.
+#Then fieboll expodes with animation.
+#Fireboll need 4 by 4 sprite with following scheme
+#down | up | right | left 
+#down | up | right | left
+#down | up | right | left
+#down | up | right | left
+#Frames of one direaction whill be switching during fly, so you can animate the missile
+#You can create fireboll with following
+#fireboll = Trap::Fireboll.build 'fireboll1' do
+#  speed 10 #speed of the missile, smaller number will lead to faster missile
+#  damage 200
+#  route do
+#    start 1, 1 #x, y
+#    down  1, 10
+#    right 10, 10
+#    up    10, 1
+#  end
+#  sprite do
+#    sprite_path 'Graphics/system/fireboll' #path to missile sprite
+#    animation 11 #expoloding animation
+#  end
+#end
+#fireboll.run
+#Now you can get the fireboll via Trap[] with selector
+####Machinegun
+#Machinegun is Trap::Fireboll automated launcher.
+#Create it with following code
+#trap = Trap::Machinegun.build 'machinegun1' do 
+#  #accepts all the settings a firebolls accepts pluse interval
+#  interval 200 #interval between launches in frames
+#  speed 10 #speed of the missile, smaller number will lead to faster missile
+#  damage 200
+#  route do
+#    start 1, 1 #x, y
+#    down  1, 10
+#    right 10, 10
+#    up    10, 1
+#  end
+#  sprite do
+#    sprite_path 'Graphics/system/fireboll' #path to missile sprite
+#    animation 11 #expoloding animation
+#  end
+#end
+#trap.run
+#Trap['machinegun1'].stop
+#Trap['machinegun1'].run
 
+module Trap
+  VERSION = '0.0.1'
+
+  module Defaults
     module Thorns
       def default_options
         {
-          damage: 100, speed: 30,
-          hazard_timeout: 5, se: { 'A' => 'Sword4'},
-          timing: { 0 => 'A', 2 => 'B', 4 => 'C', 19 => 'D', 21 => 'OFF'}
+          damage: 100, #damage of thorn's hit
+          speed: 30,   #whole cycle in frames
+          hazard_timeout: 5, #after switching to A how many frames the thor will be cutting?
+          se: { 'A' => 'Sword4'}, #se playing on each local switch
+          timing: { #on which frame of the cycle will be enabled every local switch 
+            0 => 'A', 2 => 'B', 4 => 'C', 19 => 'D', 21 => 'OFF'
+          }
+        }
+      end
+    end
+
+    module Fireboll
+      def default_options
+        { 
+          speed: 16,  #speed of missile (smaller number for faster missile fly)
+          damage: 200 #damage of missile
         }
       end
     end
 
     module Machinegun
       def default_options
-        { interval: 200 }
+        { interval: 200 } #interval in frames between every missile launch
       end
     end
 
     module FirebollSprite
       def default_options
         { 
-          speed: 0.15, 
-          sprite_path: 'Graphics/System/fireboll',
-          animation: 111
+          speed: 0.15, #speed of updating missile sprite 
+          sprite_path: 'Graphics/System/fireboll', #path to missile sprite
+          animation: 111 #die animation id
         }
       end
     end
@@ -452,8 +538,8 @@ module Trap
     end
 
   	def init_variables
-      @damage_value    = @options[:damage]
-      @default_speed   = [@options[:speed] || default_options[:speed]].max
+      @damage_value  = @options[:damage]
+      @default_speed = @options[:speed]
       assert('map') { @map_id = @options[:map] }
       assert('events') { @events = @options[:events] }
       @ticked, @hazard, @current = 0, false, -1

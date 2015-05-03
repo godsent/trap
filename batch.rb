@@ -38,6 +38,7 @@
 #Frames of one direaction whill be switching during fly, so you can animate the missile
 #You can create fireboll with following
 #fireboll = Trap::Fireboll.build 'fireboll1' do
+#  map 1
 #  speed 10 #speed of the missile, smaller number will lead to faster missile
 #  damage 200
 #  route do
@@ -59,6 +60,7 @@
 #trap = Trap::Machinegun.build 'machinegun1' do 
 #  #accepts all the settings a firebolls accepts pluse interval
 #  interval 200 #interval between launches in frames
+#  map 1
 #  speed 10 #speed of the missile, smaller number will lead to faster missile
 #  damage 200
 #  route do

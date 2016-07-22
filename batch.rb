@@ -1936,7 +1936,7 @@ class Trap::Saw < Trap::Fireboll
   end
 
   def dealed_to?(char)
-    @damage_dealed_to.any? { |_, ids| ids.include? char.id }
+    @damage_dealed_to.any? { |_, ids| ids.include? char.actor.id }
   end
 
   def stop_on_damage?
@@ -1950,7 +1950,7 @@ class Trap::Saw < Trap::Fireboll
 
   def track_dealed_damage(char)
     @damage_dealed_to[[char.x, char.y]] ||= []
-    @damage_dealed_to[[char.x, char.y]] << char.id
+    @damage_dealed_to[[char.x, char.y]] << char.actor.id
   end
 end
 #gems/trap/lib/trap/touchgun.rb
